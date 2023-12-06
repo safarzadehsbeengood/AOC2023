@@ -1,8 +1,11 @@
 from colorama import init, Fore
+import numpy as np
 init(autoreset=True)
 symbols = []
 parts = []
 partIndexes = []
+gear_ratios = []
+stars = {}
 
 def isPartNumber(row, columnStart, columnEnd, lines) -> bool:
     # above and below
@@ -21,17 +24,6 @@ def isPartNumber(row, columnStart, columnEnd, lines) -> bool:
         return True
     # print("NOT")
     return False
-
-def grabNumbers(row, column) -> list:
-    # at a '*'
-    for i in range(column-1, column+2):
-        if (i >= 0) and (i < len(lines[0])-1):
-            # above
-            if (row > 0) and lines[row-1][i].isalnum():
-                grab()
-            # below
-            if (row != len(lines)-1) and (lines[row+1][i] in symbols):
-                return True
 
 with open('input.txt', 'r') as input:
     lines = input.read().splitlines()
@@ -61,7 +53,7 @@ with open('input.txt', 'r') as input:
                 # print(str(x).ljust(15) + Fore.RED + 'row ' + Fore.WHITE + f'{line_number+1}'.ljust(20) + f'[{i}][{j}]'.rjust(10) + f' -> {isPartNumber(line_number, i, j, lines)}')
                 if (isPartNumber(line_number, i, j-1, lines)):
                     parts.append(x)
-                    partIndexes.append((x, line_number, i))
+                    partIndexes.append((x, line_number, i, j-1))
                 i += len(num)
                 num.clear()
 
@@ -70,9 +62,30 @@ with open('input.txt', 'r') as input:
                 continue
     
     # part 2
+    # collect star indices
+    def partIsNeighbor(part: tuple, star: tuple) -> bool:
+        # part -> (number, row, start_idx, end_idx)
+        # star -> (row, column)
+        if (star[0]-1 <= part[1] <= star[0]+1):
+            for i in range(part[2], part[3]+1):
+                if star[1]-1 <= i <= star[1]+1:
+                    return True
+        return False
+
     for line_number, line in enumerate(lines):
         for i in range(len(line)):
             if line[i] == '*':
-                adjacent_numbers = grabNumbers(line_number, i)
-print(partIndexes)
-print(sum(parts))
+                stars[(line_number, i)] = []
+    
+    for part in partIndexes:
+        for star in stars.keys():
+            if partIsNeighbor(part, star):
+                stars[star].append(part[0])
+
+    for star, parts in stars.items():
+        # print(f'{star}'.ljust(10) + ': ' + f'{parts}')
+        if len(parts) == 2:
+            gear_ratios.append(parts[0] * parts[1])
+    # print(gear_ratios)
+    print(sum(gear_ratios))
+        
