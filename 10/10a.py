@@ -44,7 +44,7 @@ def printGrid(pos, grid):
                     print(grid[i][j], end='')
 
 
-with open('input.txt', 'r') as input:
+with open('test_input.txt', 'r') as input:
     grid = [[*line] for line in input.read().splitlines()]
     for i in range(len(grid)):
         # print(''.join(grid[i]))
@@ -63,19 +63,19 @@ with open('input.txt', 'r') as input:
     while searching:
         curr, dist = searching.popleft()
         printGrid(curr, grid)
-        sleep(0.1)
+        # sleep(0.1)
         if visited.get(curr):
             continue
         visited[curr] = dist
         y, x = curr
         can_go = pipes[grid[y][x]]
-        # print(can_go)
+        print(can_go)
         for direction in can_go:
             dy, dx, opposite = directions[direction]
             new = (y+dy, x+dx)
             if new[0] < 0 or new[0] >= len(grid):
                 continue
-            if new[1] < 0 or new[1] >= len(grid[new[1]]):
+            if new[1] < 0 or new[1] >= len(grid[0]):
                 continue 
             target = grid[new[0]][new[1]]
             if target not in pipes:
@@ -91,5 +91,5 @@ with open('input.txt', 'r') as input:
             max_point = point
 
     print(max(visited.values()))
-    printGrid(max_point, grid)
+    # printGrid(max_point, grid)
 
